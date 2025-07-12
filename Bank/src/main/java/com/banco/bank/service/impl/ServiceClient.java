@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
+import java.util.List;
 
 
 @Service
@@ -43,6 +44,26 @@ public class ServiceClient implements IClientService {
         client.setUpdatedAt(LocalDateTime.now());
 
         return repositoryClient.save(client);
+    }
+
+    @Override
+    public void deleteByIdentification(String identificationNumber) {
+        Client client = repositoryClient.findByIdentificationNumber(identificationNumber).orElseThrow(() -> new RuntimeException("Client not found"));
+
+        if(client.getAccounts().isEmpty()){
+            repositoryClient.delete(client);
+        }else
+            throw new IllegalArgumentException("Client have a Account");
+    }
+
+    @Override
+    public Client getClientByIdentificationNumber(String identificationNumber) {
+        return repositoryClient.findByIdentificationNumber(identificationNumber).orElseThrow(RuntimeException::new);
+    }
+
+    @Override
+    public List<Client> getAllClients() {
+        return repositoryClient.findAll();
     }
 }
 
