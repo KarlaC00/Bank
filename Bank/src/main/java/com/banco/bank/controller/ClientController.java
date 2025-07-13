@@ -40,4 +40,10 @@ public class ClientController {
         serviceClient.deleteByIdentification(identificationNumber);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/by-identification/{identificationNumber}")
+    public ResponseEntity<Client> getClientById(@PathVariable String identificationNumber) {
+        Client client = serviceClient.getClientByIdentificationNumber(identificationNumber);
+        return ResponseEntity.ok().body(client);
+    }
 }
