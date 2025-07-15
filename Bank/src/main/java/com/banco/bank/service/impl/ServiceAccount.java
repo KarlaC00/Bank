@@ -9,17 +9,22 @@ import com.banco.bank.repository.RepositoryAccount;
 import com.banco.bank.repository.RepositoryTransaction;
 import com.banco.bank.service.IAccountService;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import jakarta.validation.Validator;
 
 import java.time.LocalDateTime;
 import java.util.Random;
+import java.util.Set;
 
 
 @Service
 @RequiredArgsConstructor
 public class ServiceAccount implements IAccountService{
 
+    private final Validator validator;
     private final MapperSavingAccount mapperSavingAccount;
     private final RepositoryAccount repositoryAccount;
     private final RepositoryTransaction repositoryTransaction;
@@ -28,22 +33,35 @@ public class ServiceAccount implements IAccountService{
     private final MapperTransactions mapperTransactions;
 
     @Override
-    public Account createCheckingAccount(AccountCreateDTO accountCreateDTO) {
-        String uniqueAccountNumber;
-        do {
-            long randomDigits = (random.nextLong() & Long.MAX_VALUE) % 10_000_000_000L;
-            uniqueAccountNumber = "33" + String.format("%010d", randomDigits);
-        }while (repositoryAccount.existsAccountByAccountNumber(uniqueAccountNumber));
+    public String createCheckingAccount(AccountCreateDTO accountCreateDTO) {
+        Set<ConstraintViolation<AccountCreateDTO>> violations = validator.validate(accountCreateDTO);
+        if (!violations.isEmpty()) {
+            throw new ConstraintViolationException(violations);
+        }
 
-        accountCreateDTO.setAccountNumber(uniqueAccountNumber);
+            String uniqueAccountNumber;
+            do {
+                long randomDigits = (random.nextLong() & Long.MAX_VALUE) % 10_000_000_000L;
+                uniqueAccountNumber = "33" + String.format("%010d", randomDigits);
+            } while (repositoryAccount.existsAccountByAccountNumber(uniqueAccountNumber));
 
-        Account account = mapperCheckingAccount.createCheckingAccount(accountCreateDTO);
-        return repositoryAccount.save(account);
+            accountCreateDTO.setAccountNumber(uniqueAccountNumber);
+
+            Account account = mapperCheckingAccount.createCheckingAccount(accountCreateDTO);
+            repositoryAccount.save(account);
+            return "Account created successfully";
     }
 
 
     @Override
-    public Account createSavingAccount(AccountCreateDTO accountCreateDTO) {
+    public String createSavingAccount(AccountCreateDTO accountCreateDTO) {
+
+        Set<ConstraintViolation<AccountCreateDTO>> violations = validator.validate(accountCreateDTO);
+
+        if (!violations.isEmpty()) {
+            throw new ConstraintViolationException(violations);
+        }
+
         String uniqueAccountNumber;
         do {
             long randomDigits = (random.nextLong() & Long.MAX_VALUE) % 10_000_000_000L;
@@ -54,7 +72,8 @@ public class ServiceAccount implements IAccountService{
 
         Account account = mapperSavingAccount.createSavingAccount(accountCreateDTO);
 
-        return repositoryAccount.save(account);
+        repositoryAccount.save(account);
+        return "Account created successfully";
     }
 
     @Override
@@ -73,7 +92,8 @@ public class ServiceAccount implements IAccountService{
         Account account = repositoryAccount.findByAccountNumber(accountNumber).orElseThrow(() -> new EntityNotFoundException("Account not found 1") );
 
         if(account.getBalance() == 0){
-            repositoryAccount.delete(account);
+            account.setStatus(StatusAccount.CANCELLED);
+            repositoryAccount.save(account);
         }else
             throw new IllegalArgumentException("You shouldn't have money in the account");
     }

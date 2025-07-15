@@ -20,13 +20,12 @@ public class ClientController {
     }
 
     @PostMapping
-    public ResponseEntity<Client> createClient(@Valid @RequestBody ClientCreateDTO clientCreateDTO) {
-        Client client = serviceClient.createClient(clientCreateDTO);
-        return ResponseEntity.ok().body(client);
+    public String createClient(@Valid @RequestBody ClientCreateDTO clientCreateDTO) {
+        return serviceClient.createClient(clientCreateDTO);
     }
 
     @PutMapping("/by-identification/{identificationNumber}")
-    public ResponseEntity<Client> updateClient(@PathVariable String identificationNumber, @RequestBody UpdateClientDTO updateClientDTO) {
+    public ResponseEntity<Client> updateClient(@Valid @PathVariable String identificationNumber, @RequestBody UpdateClientDTO updateClientDTO) {
         return ResponseEntity.ok().body(serviceClient.updateClient(identificationNumber, updateClientDTO));
     }
 

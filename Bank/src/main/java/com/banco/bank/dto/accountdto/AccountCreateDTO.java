@@ -1,7 +1,9 @@
 package com.banco.bank.dto.accountdto;
 
 import com.banco.bank.model.ExemptGMF;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,9 +13,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 
 public class AccountCreateDTO {
-    @NotNull(message = "Can't be Null")
+    @NotBlank(message = "Can't be Null")
+    @Pattern(regexp = "\\d+", message = "Only numbers are allowed and positive")
     private String identificationNumber;
-    @NotNull(message = "Can't be Null")
     private String accountNumber;
     private ExemptGMF exemptGMF;
 }

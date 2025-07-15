@@ -27,9 +27,10 @@ public class ServiceClient implements IClientService {
     }
 
     @Override
-    public Client createClient(ClientCreateDTO clientCreateDTO) {
+        public String createClient(ClientCreateDTO clientCreateDTO) {
         if (adultValidation(clientCreateDTO.getBirthDate())) {
-            return repositoryClient.save(mapperClient.createClient(clientCreateDTO));
+            repositoryClient.save(mapperClient.createClient(clientCreateDTO));
+            return "Client created successfully";
         }else
             throw new IllegalArgumentException("You should be over 18 years old");
     }
