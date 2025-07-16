@@ -29,9 +29,8 @@ public class AccountController {
     }
 
     @PutMapping("/by-accountNumber/{accountNumber}")
-    public ResponseEntity<Account> updateAccount(@PathVariable String accountNumber, @RequestBody AccountUpdateDTO accountUpdateDTO) {
-        Account updatedAccount = serviceAccount.updateAccount(accountNumber, accountUpdateDTO);
-        return ResponseEntity.ok(updatedAccount);
+    public String updateAccount(@PathVariable String accountNumber, @RequestBody AccountUpdateDTO accountUpdateDTO) {
+        return serviceAccount.updateAccount(accountNumber, accountUpdateDTO);
     }
 
     @DeleteMapping("/by-accountNumber/{accountNumber}")

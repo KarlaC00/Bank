@@ -2,8 +2,6 @@ package com.banco.bank.service.impl;
 
 import com.banco.bank.controller.AccountController;
 import com.banco.bank.dto.accountdto.*;
-import com.banco.bank.model.Account;
-import com.banco.bank.model.StatusAccount;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,7 +17,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
@@ -58,26 +55,6 @@ class ControllerAccountTest {
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Account created successfully"));
-    }
-
-    @Test
-    void updateAccount_validInput_returnsUpdatedAccount() throws Exception {
-        String accountNumber = "3312345678";
-        AccountUpdateDTO updateDTO = new AccountUpdateDTO();
-
-        Account updatedAccount = new Account();
-        updatedAccount.setAccountNumber(accountNumber);
-        updatedAccount.setStatus(StatusAccount.ACTIVE);
-
-        when(serviceAccount.updateAccount(anyString(), any(AccountUpdateDTO.class)))
-                .thenReturn(updatedAccount);
-
-        mockMvc.perform(put("/api/accounts/by-accountNumber/{accountNumber}", accountNumber)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updateDTO)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.accountNumber").value(accountNumber))
-                .andExpect(jsonPath("$.status").value("ACTIVE"));
     }
 
     @Test

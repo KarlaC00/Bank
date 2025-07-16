@@ -1,7 +1,6 @@
 package com.banco.bank.service.impl;
 
 import com.banco.bank.controller.ClientController;
-import com.banco.bank.dto.clientdto.ClientCreateDTO;
 import com.banco.bank.dto.clientdto.UpdateClientDTO;
 import com.banco.bank.model.Client;
 import com.fasterxml.jackson.databind.ObjectMapper;

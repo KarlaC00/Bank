@@ -77,19 +77,20 @@ public class ServiceAccount implements IAccountService{
     }
 
     @Override
-    public Account updateAccount(String accountNumber, AccountUpdateDTO accountUpdateDTO) {
+    public String updateAccount(String accountNumber, AccountUpdateDTO accountUpdateDTO) {
         Account account = repositoryAccount.findByAccountNumber(accountNumber)
-                .orElseThrow(() -> new EntityNotFoundException("Account not foundq"));
+                .orElseThrow(() -> new EntityNotFoundException("Account not found"));
 
         account.setStatus(accountUpdateDTO.getStatus());
         account.setUpdatedAt(LocalDateTime.now());
 
-        return repositoryAccount.save(account);
+        repositoryAccount.save(account);
+        return "Modified account";
     }
 
     @Override
     public void deleteAccount(String accountNumber) {
-        Account account = repositoryAccount.findByAccountNumber(accountNumber).orElseThrow(() -> new EntityNotFoundException("Account not found 1") );
+        Account account = repositoryAccount.findByAccountNumber(accountNumber).orElseThrow(() -> new EntityNotFoundException("Account not found") );
 
         if(account.getBalance() == 0){
             account.setStatus(StatusAccount.CANCELLED);
@@ -101,7 +102,7 @@ public class ServiceAccount implements IAccountService{
     @Override
     public void withdraw(OperationAccountDTO operationAccountDTO) {
         Account account = repositoryAccount.findByAccountNumber(operationAccountDTO.getAccountNumber())
-                .orElseThrow(() -> new EntityNotFoundException("Account not found1"));
+                .orElseThrow(() -> new EntityNotFoundException("Account not found"));
 
         if ((account.getAccountType() == AccountType.SAVING || account.getAccountType() == AccountType.CHECKING)
                 && account.getStatus() == StatusAccount.ACTIVE) {
@@ -150,7 +151,7 @@ public class ServiceAccount implements IAccountService{
     @Override
     public void transferMoney(TransferDTO transferDTO) {
         Account fromAccount = repositoryAccount.findByAccountNumber(transferDTO.getFromAccountNumber()).orElseThrow(() -> new RuntimeException("No found origin account"));
-        Account toAccount = repositoryAccount.findByAccountNumber(transferDTO.getToAccountNumber()).orElseThrow(() -> new RuntimeException("No found origin account"));
+        Account toAccount = repositoryAccount.findByAccountNumber(transferDTO.getToAccountNumber()).orElseThrow(() -> new RuntimeException("No found destination account"));
 
         if(fromAccount.getStatus() == StatusAccount.ACTIVE && toAccount.getStatus() == StatusAccount.ACTIVE){
             if (fromAccount.getBalance() < transferDTO.getAmount()) {
